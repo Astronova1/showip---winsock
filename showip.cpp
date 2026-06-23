@@ -4,6 +4,7 @@
 #include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <cstring>
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -24,6 +25,7 @@ int main(int argc, char *argv[]) {
     memset(&hints, 0, sizeof(hints));     //set hints to 0
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;               //use tcp connection
+    char ipst[INET6_ADDRSTRLEN];
 
     int status;
     if ((status = getaddrinfo(argv[1], nullptr, &hints, &res )) != 0) {
@@ -35,7 +37,7 @@ int main(int argc, char *argv[]) {
         struct sockaddr_in* ipv4;
         struct sockaddr_in6* ipv6;
         void* addr;
-        char* ipver;
+        const char* ipver;
 
         if (p->ai_family == AF_INET) {
             ipv4 = (struct sockaddr_in*)p->ai_addr;
@@ -47,5 +49,9 @@ int main(int argc, char *argv[]) {
             addr = &(ipv6->sin6_addr);
             ipver = "IPv6";
         }
+        inet_ntop(p->ai_family,addr ,ipst, sizeof ipst);
+        cout << ipver << " " << ipst << endl;
     }
+    freeaddrinfo(res);
+    WSACleanup();
 }
